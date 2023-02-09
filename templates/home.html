@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style>
+        .box {
+            padding:10px;
+            margin:0 60px;
+            border-radius:99px;
+            border:2px solid rgb(131, 131, 131);
+            display:inline-block;
+            position:relative;
+        }
+        .box::before {
+            content:"";
+            position:absolute;
+            z-index:-1;
+            left:-50px;
+            right:-50px;
+            height:20px;
+            top:calc(50% - 10px);
+            background:
+                /*arrow*/
+                linear-gradient(to bottom right,rgb(131, 131, 131) 49%,transparent 52%) bottom right/15px 50%,
+                linear-gradient(to top right,rgb(131, 131, 131) 49%,transparent 52%) top right/15px 50%,
+                /*circle*/
+                /*line*/
+                linear-gradient(rgb(131, 131, 131),rgb(131, 131, 131)) right center/50px 2px,
+                linear-gradient(rgb(131, 131, 131),rgb(131, 131, 131)) left center /50px 2px;
+            background-repeat:no-repeat;
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//code.jquery.com/jquery.js"></script>
+    <title>Login</title>
+    <!-- <h3 class="box"></h3> -->
+</head>
+<script>
+    next=false
+    const e1 = [];
+    const e2 = [];
+    function set_id_for_token()
+    {
+        i=0
+        $('body').find('.token').each(function()
+            {
+                $(this).attr("id", i);
+                i=i+1;
+            }
+            )
+        i=0
+        $('body').find('.token2').each(function()
+            {
+                $(this).attr("id", i);
+                if(i===10)
+                    $(this).after('<br>')
+                i=i+1;
+            }
+            )
+    }
+    $(document).on('click', '.token', function(){
+        id=$(this).attr('id');
+        if (next===false)
+        {
+            $('#'+id+'.token2').css("background-color", "yellow");
+            e1.push(id);
+        }
+        else
+        {
+            $('#'+id+'.token2').css("background-color", "rgb(75, 255, 117)");
+            e2.push(id)
+        }
+        console.log(e1, '_', e2);
+    });
+    $(document).on('click', '.next', function(){
+        next=true
+    });
+    $(document).on('click', '.checkrelation', function(){
+        $('.status').text('Keep waiting...')
+        $.ajax({
+            url: '/predict',
+            type: 'get',
+            contentType: 'appication/json',
+            data: {
+                'e1pos': e1,
+                'e2pos': e2,
+            },
+            success: function(response){
+                $('.status').text(response.acc+'%')
+                $('.result_e1').text(response.e1)
+                $('.result_re').text(response.type)
+                $('.result_re').attr('class', 'result_re box')
+                $('.result_e2').text(response.e2)
+            }
+        })
+    });
+</script>
+<body style="background-color: rgb(239, 239, 239);">
+    <fieldset>
+        <table>
+            <tbody>
+                <form method="post">
+                    <h1>Sentence: </h1>
+                    <input size="150" id='sentence' type="text" name="sentence"  autocomplete="off" required>
+                    <input type="submit" id=summitbutton value="Submit" name=SubmitButton> </td>
+                </form>
+            </tbody>
+        </table>
+    </fieldset>
+    <h3 class=choose_entity>
+        {% if sentence_token %}
+            {% for token in sentence_token %}
+                <button class="token" type="button">{{token}}</button>
+            {% endfor %}
+            <br><br><br>
+            <button class="next" type="button">>></button>
+            <button type="button">Reset</button>
+            <button class="checkrelation" type="button">Check relation</button>
+            <br><br>
+            <div style="display: flex">
+                {% for token in sentence_token %}
+                    <h4 class="token2">{{token}}&nbsp;</h4>
+                {% endfor %}
+            </div>
+            <script>set_id_for_token();</script>
+        {% endif %}
+    </h3>
+    <div class="result">
+        <h3 class="status"></h3>
+        <div>
+            <h3 class="result_e1"></h3>
+            <h3 class="result_re"></h3>
+            <h3 class="result_e2"></h3>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<!-- <script> 
+    $(document).ready(function()
+    {
+        $(document).on('click', '#summitbutton', function()
+        {
+            my_username=$("#username").val()
+            my_password=$("#password").val()
+            $(".thongbao").text(my_username)
+        });
+    });   
+</scrip-->
