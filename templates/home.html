@@ -38,27 +38,40 @@
 </head>
 <script>
     next=false
-    const e1 = [];
-    const e2 = [];
-    function set_id_for_token()
-    {
-        i=0
-        $('body').find('.token').each(function()
-            {
-                $(this).attr("id", i);
-                i=i+1;
+    let e1 = [];
+    let e2 = [];
+    $(document).on('click', '.sentencesummit', function(){
+        sentence=$('input#sentence').val()
+        $.ajax({
+            url: '/tokenize',
+            type: 'get',
+            contentType: 'appication/json',
+            data: {
+                'sentence': sentence
+            },
+            success: function(response){
+                a=response.sentence_token
+                for (let i = 0; i < a.length; i++) {
+                    $('div.token_to_choose').append('<button id='+i+' class="token">'+a[i]+'</button>&nbsp')
+                    $('div.token_choosed').append('<h4 id='+i+' class="token2">'+a[i]+'&nbsp</h4>')
+                }
+                $('button.next').removeAttr('hidden')
+                $('button.reset').removeAttr('hidden')
+                $('button.checkrelation').removeAttr('hidden')
             }
-            )
-        i=0
-        $('body').find('.token2').each(function()
-            {
-                $(this).attr("id", i);
-                if(i===10)
-                    $(this).after('<br>')
-                i=i+1;
-            }
-            )
-    }
+        })
+    });
+
+    $(document).on('click', '.reset', function(){
+        for (let i = 0; i < e1.length; i++)
+            $('#'+e1[i]+'.token2').css("background-color", "");
+        for (let i = 0; i < e2.length; i++)
+            $('#'+e2[i]+'.token2').css("background-color", "");
+        e1 = []
+        e2 = []
+        next=false
+    });
+
     $(document).on('click', '.token', function(){
         id=$(this).attr('id');
         if (next===false)
@@ -73,9 +86,11 @@
         }
         console.log(e1, '_', e2);
     });
+
     $(document).on('click', '.next', function(){
         next=true
     });
+    
     $(document).on('click', '.checkrelation', function(){
         $('.status').text('Keep waiting...')
         $.ajax({
@@ -100,31 +115,27 @@
     <fieldset>
         <table>
             <tbody>
-                <form method="post">
+                <form>
                     <h1>Sentence: </h1>
-                    <input size="150" id='sentence' type="text" name="sentence"  autocomplete="off" required>
-                    <input type="submit" id=summitbutton value="Submit" name=SubmitButton> </td>
+                    <input size="150" id='sentence' type="text" name="sentence" required><br>
+                    <input class=sentencesummit type="button" value="Send sentence">
                 </form>
             </tbody>
         </table>
     </fieldset>
+    <br>
     <h3 class=choose_entity>
-        {% if sentence_token %}
-            {% for token in sentence_token %}
-                <button class="token" type="button">{{token}}</button>
-            {% endfor %}
-            <br><br><br>
-            <button class="next" type="button">>></button>
-            <button type="button">Reset</button>
-            <button class="checkrelation" type="button">Check relation</button>
-            <br><br>
-            <div style="display: flex">
-                {% for token in sentence_token %}
-                    <h4 class="token2">{{token}}&nbsp;</h4>
-                {% endfor %}
+            <div class="token_to_choose">
+                <!-- <button class="token" type="button">{{token}}</button> -->
             </div>
-            <script>set_id_for_token();</script>
-        {% endif %}
+            <br><br><br>
+            <button class="next" hidden>>>>></button>
+            <button class="reset" type="button" hidden>Reset</button>
+            <button class="checkrelation" hidden>Check relation</button>
+            <br><br>
+            <div class="token_choosed" style="display: flex">
+                <!-- <h4 class="token2">{{token}}&nbsp;</h4> -->
+            </div>
     </h3>
     <div class="result">
         <h3 class="status"></h3>
@@ -137,15 +148,3 @@
 
 </body>
 </html>
-
-<!-- <script> 
-    $(document).ready(function()
-    {
-        $(document).on('click', '#summitbutton', function()
-        {
-            my_username=$("#username").val()
-            my_password=$("#password").val()
-            $(".thongbao").text(my_username)
-        });
-    });   
-</scrip-->
