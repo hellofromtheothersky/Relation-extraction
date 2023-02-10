@@ -1,6 +1,6 @@
 import re
 import pickle
-from process_data import get_feature, RE_DataEncoder
+from relation_extraction.process_data import get_feature, RE_DataEncoder
 from keras.models import model_from_json
 
 
