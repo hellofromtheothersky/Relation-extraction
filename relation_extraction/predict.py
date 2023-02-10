@@ -1,7 +1,8 @@
 import re
 import pickle
-from relation_extraction.process_data import get_feature, RE_DataEncoder
+from relation_extraction.process_data import get_feature_sp_based, RE_DataEncoder_sp_based
 from keras.models import model_from_json
+import numpy as np
 
 
 def load_model(model_name):
@@ -18,11 +19,35 @@ def go_predict(model, input):
     with open("relation_extraction/data_encoder.obj", "rb") as rf:
         Encoder = pickle.load(rf)
 
-    sentences, e1_distance, e2_distance, grammar, sp = get_feature([input])
-    sentences_np, e1_dist_np, e2_dist_np, grammar_np, sp_np = Encoder.encode(
-        sentences, e1_distance, e2_distance, grammar, sp
+    sentences, e1_distance, e2_distance, dependency_direct, dependency_type = get_feature_sp_based([input])
+    sentences, e1_distance, e2_distance, dependency_direct, dependency_type = Encoder.encode(
+        sentences, e1_distance, e2_distance, dependency_direct, dependency_type
     )
-    pred = model.predict([sentences_np, e1_dist_np, e2_dist_np, grammar_np, sp_np])
+
+    sent1=[]
+    sent2=[]
+    e1_1, e2_1, e1_2, e2_2 = [], [], [], []
+    sp_dir, sp_type = [], []
+    for i in range(1):
+        sent1.append(sentences[i][:-1])
+        sent2.append(sentences[i][1:])
+        e1_1.append(e1_distance[i][:-1])
+        e1_2.append(e1_distance[i][1:])
+        e2_1.append(e2_distance[i][:-1])
+        e2_2.append(e2_distance[i][1:])
+        sp_dir.append(dependency_direct[i][:-1])
+        sp_type.append(dependency_direct[i][:-1])
+
+    sent1=np.array(sent1)
+    sent2=np.array(sent2)
+    e1_1=np.array(e1_1)
+    e1_2=np.array(e1_2)
+    e2_1=np.array(e2_1)
+    e2_2=np.array(e2_2)
+    sp_dir=np.array(sp_dir)
+    sp_type=np.array(sp_type)
+
+    pred = model.predict([sent1, sent2, e1_1, e1_2, e2_1, e2_2, sp_dir, sp_type])
     acc=pred[0].max()
     pred = pred.argmax(axis=1)
     return Encoder.dict_labels[int(pred)], acc
@@ -72,7 +97,8 @@ if __name__ == "__main__":
     print(
         go_predict(
             load_model("cnn_nonbert"),
-            '<e1>he</e1> go to <e2>bed</e2>',
-
+            #'<e1>he</e1> go to <e2>bed</e2>'
+            #'<e1>iphone</e1> is made by <e2>apple</e2>'
+            '<e1>apple</e1> make <e2>iphone</e2>'
         )
     )

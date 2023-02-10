@@ -3,7 +3,7 @@ from flask import request
 from flask import redirect, url_for
 from flask import session
 from flask import jsonify
-from relation_extraction.process_data import RE_DataEncoder
+from relation_extraction.process_data import RE_DataEncoder_sp_based
 import relation_extraction.predict as re_model
 
 app = Flask(__name__)
