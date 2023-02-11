@@ -7,6 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1yONHpAXIijO8i4-eb7BO4tyDF03EIcnX
 """
 
+# from google.colab import drive
+# drive.mount('/content/drive/')
+
+# BASE_DIR="/content/drive/MyDrive/nlp/relation_extraction/"
+BASE_DIR=""
+
 import pandas as pd
 import numpy as np
 import re
@@ -44,7 +50,6 @@ def split_entity(s):
     token=sentence.split()
     sentence=' '.join(token)
     return {'sentence': sentence, 'epos': epos, 'token': token}
-#split_entity('The solute was placed inside a beaker and 5 mL of the <e1>solvent</e1> was pipetted into a 25 mL glass <e2>flask</e2> for each trial.')
 
 
 def create_relative_distance(sentence_data):
@@ -160,12 +165,14 @@ def get_feature(data):
 
 class RE_DataEncoder():
     def __init__(self, vocab_size, max_len, sentences_train, grammar_train, label_train):
+        self.max_len=max_len
+        self.vocab_size=vocab_size
+    
         #for the sentences
         self.tokenizer = Tokenizer(num_words=vocab_size, filters='!"#$%&()*+,-./:;=?@[]^_`{|}~', lower=True, oov_token=1)
         self.tokenizer.fit_on_texts(sentences_train)
         self.word_index = self.tokenizer.word_index
-        self.word_size = len(self.word_index)
-        self.max_len=max_len
+        self.word_size = len(self.word_index) #different from vocab size
 
         #for the grammar
         grammar_type=[]
@@ -225,48 +232,6 @@ class RE_DataEncoder():
         label = np.array(label)
         return label
 
-# data=pd.read_csv('/content/drive/MyDrive/nlp/relation_extraction/data/kbp37-master.csv')
-# data=data.dropna()
-# data=data.rename(columns={'sentences': 'sentence'})
-# data['relationship']=data['relationship'].str.strip()
-
-# def drop_sentence_no_ent(row):
-#     sentence_data=split_entity(row['sentence'])
-#     if sentence_data['epos'][0][1]<sentence_data['epos'][0][0] or sentence_data['epos'][1][1]<sentence_data['epos'][1][0]:
-#         row['sentence']=None
-#     return row
-
-# data=data.apply(drop_sentence_no_ent, axis=1).dropna()
-
-# train, test = train_test_split(data, test_size=0.2)
-
-# tokenizer = Tokenizer(num_words=1, filters='!"#$%&()*+,-./:;=?@[]^_`{|}~', lower=True, oov_token=1)
-# tokenizer.fit_on_texts(kk[0])
-# word_index = tokenizer.word_index
-# word_size = len(word_index)
-# word_size
-
-# train.to_csv('/content/drive/MyDrive/nlp/relation_extraction/data/train.csv')
-# test.to_csv('/content/drive/MyDrive/nlp/relation_extraction/data/test.csv')
-
-# nlp = spacy.load("en_core_web_sm")
-# data = pd.read_csv('/content/drive/MyDrive/nlp/relation_extraction/data/'+'train'+'.csv')
-# data=data[:10]
-# sentences, e1_distance, e2_distance, grammar, shortest_path, label=get_feature(data)
-
-# with open('/content/drive/MyDrive/nlp/relation_extraction/data/'+'train'+'_features.json', 'r') as r:
-#                 data=json.load(r)
-# sentences=data['sentences']
-# e1_distance=data['e1_distance']
-# e2_distance=data['e2_distance']
-# dependency_direct=data['dependency_direct']
-# dependency_type=data['dependency_type']
-# label=data['label']
-
-# import seaborn as sns
-# print(max([len(x) for x in dependency_type]))
-# sns.histplot([len(x) for x in dependency_type]);
-
 if __name__ == "__main__":
 
     vocab_size=20000
@@ -276,10 +241,10 @@ if __name__ == "__main__":
 
     for type in ['train', 'test']:
         if read_new_data==True:
-            data = pd.read_csv('/content/drive/MyDrive/nlp/relation_extraction/data/'+type+'.csv')
+            data = pd.read_csv(BASE_DIR+'data/'+type+'.csv')
             sentences, e1_distance, e2_distance, grammar, shortest_path=get_feature(data)
             label=list(data['relationship'])
-            with open('/content/drive/MyDrive/nlp/relation_extraction/data/'+type+'_features.json', 'w') as w:
+            with open(BASE_DIR+'data/'+type+'_features.json', 'w') as w:
                 json.dump({'sentences': sentences, 
                         'e1_distance': e1_distance, 
                         'e2_distance': e2_distance, 
@@ -288,7 +253,7 @@ if __name__ == "__main__":
                         'label': label
                         }, w)     
         else:
-            with open('/content/drive/MyDrive/nlp/relation_extraction/data/'+type+'_features.json', 'r') as r:
+            with open(BASE_DIR+'data/'+type+'_features.json', 'r') as r:
                 data=json.load(r)
             sentences=data['sentences']
             e1_distance=data['e1_distance']
@@ -309,9 +274,9 @@ if __name__ == "__main__":
         label_np=Encoder.encode_label(label)
                                                                                           
         all_features=np.array([sentences_np, e1_distance_np, e2_distance_np, grammar_np, shortest_path_np])
-        np.save('/content/drive/MyDrive/nlp/relation_extraction/data/X_'+type+'.npy', all_features)
-        np.save('/content/drive/MyDrive/nlp/relation_extraction/data/y_'+type+'.npy', label_np)
+        np.save(BASE_DIR+'data/X_'+type+'.npy', all_features)
+        np.save(BASE_DIR+'data/y_'+type+'.npy', label_np)
 
         #save encoder class
-        with open('/content/drive/MyDrive/nlp/relation_extraction/data/data_encoder.obj', 'wb') as f:
+        with open(BASE_DIR+'data/data_encoder.obj', 'wb') as f:
             pickle.dump(Encoder, f)

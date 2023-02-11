@@ -1,11 +1,10 @@
 import re
 import pickle
-from process_data import get_feature, RE_DataEncoder
+from relation_extraction.process_data import get_feature, RE_DataEncoder
 from keras.models import model_from_json
 
 
 def load_model(model_name):
-    # path='/content/drive/MyDrive/nlp/relation_extraction/saved_model/'
     path = "relation_extraction/saved_model/"
     with open(path + model_name + ".json", "r") as rf:
         jstr = rf.read()
@@ -15,7 +14,7 @@ def load_model(model_name):
 
 
 def go_predict(model, input):
-    with open("relation_extraction/data_encoder.obj", "rb") as rf:
+    with open("relation_extraction/data/data_encoder.obj", "rb") as rf:
         Encoder = pickle.load(rf)
 
     sentences, e1_distance, e2_distance, grammar, sp = get_feature([input])
