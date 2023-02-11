@@ -1,6 +1,6 @@
 import re
 import pickle
-from relation_extraction.process_data import get_feature, RE_DataEncoder
+from process_data import get_feature, RE_DataEncoder
 from keras.models import model_from_json
 
 
@@ -22,6 +22,8 @@ def go_predict(model, input):
     sentences_np, e1_dist_np, e2_dist_np, grammar_np, sp_np = Encoder.encode(
         sentences, e1_distance, e2_distance, grammar, sp
     )
+    print(sentences, sp_np)
+
     pred = model.predict([sentences_np, e1_dist_np, e2_dist_np, grammar_np, sp_np])
     acc=pred[0].max()
     pred = pred.argmax(axis=1)
@@ -72,7 +74,6 @@ if __name__ == "__main__":
     print(
         go_predict(
             load_model("cnn_nonbert"),
-            '<e1>he</e1> go to <e2>bed</e2>',
-
+            'the <e1>Titanic</e1> set sail on its maiden voyage, traveling from Southampton, England, to <e2>New York City</e2>',
         )
     )
