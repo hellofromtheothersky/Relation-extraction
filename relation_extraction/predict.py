@@ -3,9 +3,11 @@ import pickle
 from relation_extraction.process_data import get_feature, RE_DataEncoder
 from keras.models import model_from_json
 
+MODEL_NAME='cnn'
+BASE_DIR='relation_extraction/'
 
 def load_model(model_name):
-    path = "relation_extraction/saved_model/"
+    path = BASE_DIR+"saved_model/"
     with open(path + model_name + ".json", "r") as rf:
         jstr = rf.read()
     model = model_from_json(jstr)
@@ -14,7 +16,7 @@ def load_model(model_name):
 
 
 def go_predict(model, input):
-    with open("relation_extraction/data/data_encoder.obj", "rb") as rf:
+    with open(BASE_DIR+"data/data_encoder.obj", "rb") as rf:
         Encoder = pickle.load(rf)
 
     sentences, e1_distance, e2_distance, grammar, sp = get_feature([input])
@@ -61,7 +63,7 @@ def predict(text, e1pos, e2pos):
     )
     print(text)
 
-    label, acc = go_predict(load_model("cnn_nonbert"), text)
+    label, acc = go_predict(load_model(MODEL_NAME), text)
     re_type=label.split('(')[0]
     if 'e1,e2' in label:
         return e1, re_type, e2, round(acc*100, 1)
@@ -72,7 +74,7 @@ def predict(text, e1pos, e2pos):
 if __name__ == "__main__":
     print(
         go_predict(
-            load_model("cnn_nonbert"),
+            load_model(MODEL_NAME),
             'the <e1>Titanic</e1> set sail on its maiden voyage, traveling from Southampton, England, to <e2>New York City</e2>',
         )
     )
