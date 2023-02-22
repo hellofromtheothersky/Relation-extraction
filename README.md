@@ -12,7 +12,7 @@ Contributors to the project
   <th>Member</th>
 </tr>
 <tr>
-  <td>Nguyen Hung Trung Hieu **</td>
+  <td>Nguyen Hung Trung Hieu ***</td>
 </tr>
 <tr>
   <td>Trinh The Hien *</td>
