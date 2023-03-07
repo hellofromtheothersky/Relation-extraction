@@ -17,3 +17,6 @@ How it run:
 - apps.py: demo app
 
 I implement two approaches to represent the shortest dependency path feature to the model, the second approach is currently in the sp-bases branch
+
+# Experiment and results
+<img src="https://user-images.githubusercontent.com/84280247/223452855-087c57ef-70f0-4c17-9118-2169336332bf.png"  width="500">
