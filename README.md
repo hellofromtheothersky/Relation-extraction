@@ -10,7 +10,7 @@ Relation Extraction (RE) is the task of finding the relation which exists betwee
 
 <img width="461" alt="image" src="https://user-images.githubusercontent.com/84280247/220658280-0b80c51d-efe1-4036-a896-c77ebc7f8a73.png">
 
-How it run:
+How does it run:
 - process_data.py: gennerate X_train, X_test, y_train, y_test in numpy file from raw data in the relation-extraction/data, and create a data_encoder.obj
 - model.py: use the data after being processed to train model, and create model saved in relation-extraction/saved_model
 - predict.py: predict relation for a data sample, it use process_data.py to generate features, and data_encoder.obj to encode and then load the model saved to predict
@@ -20,3 +20,7 @@ I implement two approaches to represent the shortest dependency path feature to 
 
 # Experiment and results
 <img src="https://user-images.githubusercontent.com/84280247/223452855-087c57ef-70f0-4c17-9118-2169336332bf.png"  width="500">
+
+# Demo
+<img src="https://user-images.githubusercontent.com/84280247/223474150-4a567212-0ec5-4426-a766-daa9741c2ad7.png"  width="800">
+
